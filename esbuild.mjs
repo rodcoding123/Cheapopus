@@ -23,9 +23,9 @@ function copyVendorAssets() {
 
 copyVendorAssets();
 
-// ── esbuild: bundle extension host code ──
+// ── Target 1: VS Code extension (CJS) ──
 /** @type {import('esbuild').BuildOptions} */
-const buildOptions = {
+const extensionOptions = {
   entryPoints: ["src/extension.ts"],
   bundle: true,
   outfile: "dist/extension.js",
@@ -37,11 +37,33 @@ const buildOptions = {
   minify: false,
 };
 
+// ── Target 2: MCP server (ESM, stdio) ──
+/** @type {import('esbuild').BuildOptions} */
+const mcpServerOptions = {
+  entryPoints: ["src/mcp-server/index.ts"],
+  bundle: true,
+  outfile: "dist/mcp-server.js",
+  format: "esm",
+  platform: "node",
+  target: "node18",
+  sourcemap: true,
+  minify: false,
+  banner: {
+    js: 'import{createRequire}from"module";const require=createRequire(import.meta.url);',
+  },
+};
+
 if (watch) {
-  const ctx = await esbuild.context(buildOptions);
-  await ctx.watch();
-  console.log("Watching for changes...");
+  const [extCtx, mcpCtx] = await Promise.all([
+    esbuild.context(extensionOptions),
+    esbuild.context(mcpServerOptions),
+  ]);
+  await Promise.all([extCtx.watch(), mcpCtx.watch()]);
+  console.log("Watching for changes (extension + mcp-server)...");
 } else {
-  await esbuild.build(buildOptions);
-  console.log("Build complete: dist/extension.js");
+  await Promise.all([
+    esbuild.build(extensionOptions),
+    esbuild.build(mcpServerOptions),
+  ]);
+  console.log("Build complete: dist/extension.js + dist/mcp-server.js");
 }

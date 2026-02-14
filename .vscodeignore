@@ -7,3 +7,6 @@ esbuild.mjs
 **/*.ts
 **/*.map
 *.vsix
+!dist/mcp-server.js
+!dist/mcp-server.js.map
+!skills/**
