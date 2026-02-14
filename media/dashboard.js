@@ -1,4 +1,4 @@
-/* Swarm Monitor Dashboard — Webview Script */
+/* Copus Dashboard — Webview Script */
 
 (function () {
   "use strict";

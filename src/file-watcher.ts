@@ -38,13 +38,13 @@ export class FileWatcher implements vscode.Disposable {
     this.fsWatcher.onDidDelete(() => this.statusBar.showNoData(), undefined, this.disposables);
 
     // Polling fallback (file watcher can miss changes on some OS)
-    const config = vscode.workspace.getConfiguration("swarmMonitor");
+    const config = vscode.workspace.getConfiguration("copus");
     const intervalSec = config.get<number>("refreshInterval") ?? 30;
     this.pollTimer = setInterval(() => void this.safeRefresh(), intervalSec * 1000);
 
     // Re-initialize if settings change
     vscode.workspace.onDidChangeConfiguration((e) => {
-      if (e.affectsConfiguration("swarmMonitor")) {
+      if (e.affectsConfiguration("copus")) {
         this.restart();
       }
     }, undefined, this.disposables);
@@ -71,7 +71,7 @@ export class FileWatcher implements vscode.Disposable {
     try {
       await this.refresh();
     } catch (error) {
-      console.debug("[Swarm Monitor] Refresh failed:", error);
+      console.debug("[Copus] Refresh failed:", error);
     }
   }
 

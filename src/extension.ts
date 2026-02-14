@@ -1,16 +1,16 @@
 import * as vscode from "vscode";
 import { StatusBar } from "./status-bar.js";
 import { FileWatcher } from "./file-watcher.js";
-import { SwarmDashboardPanel } from "./webview-panel.js";
+import { CopusDashboardPanel } from "./webview-panel.js";
 import { parseUsageFile } from "./usage-parser.js";
 
 let statusBar: StatusBar | undefined;
 let fileWatcher: FileWatcher | undefined;
-let dashboardPanel: SwarmDashboardPanel | undefined;
+let dashboardPanel: CopusDashboardPanel | undefined;
 
 export function activate(context: vscode.ExtensionContext): void {
-  const outputChannel = vscode.window.createOutputChannel("Swarm Monitor");
-  outputChannel.appendLine("Swarm Monitor activated");
+  const outputChannel = vscode.window.createOutputChannel("Copus");
+  outputChannel.appendLine("Copus activated");
 
   // Status bar
   statusBar = new StatusBar();
@@ -24,9 +24,9 @@ export function activate(context: vscode.ExtensionContext): void {
 
   // Command: open dashboard webview
   const openDashboard = vscode.commands.registerCommand(
-    "swarmMonitor.openDashboard",
+    "copus.openDashboard",
     async () => {
-      dashboardPanel = SwarmDashboardPanel.createOrShow(context.extensionUri);
+      dashboardPanel = CopusDashboardPanel.createOrShow(context.extensionUri);
 
       // Send current data immediately on open
       const data = await parseUsageFile();

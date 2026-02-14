@@ -1,8 +1,8 @@
 {
-  "name": "swarm-monitor",
-  "displayName": "Swarm Monitor",
-  "description": "Real-time MCP swarm usage analytics — prompts remaining, cost savings vs Opus, usage patterns, and performance metrics.",
-  "version": "0.1.0",
+  "name": "copus",
+  "displayName": "Copus",
+  "description": "MCP swarm development pipeline — real-time cost analytics, Opus vs MiniMax routing, and integrated skill chain for Claude Code.",
+  "version": "0.2.0",
   "publisher": "rodrigo-specter",
   "license": "MIT",
   "repository": {
@@ -32,26 +32,26 @@
   "contributes": {
     "commands": [
       {
-        "command": "swarmMonitor.openDashboard",
-        "title": "Swarm Monitor: Open Dashboard"
+        "command": "copus.openDashboard",
+        "title": "Copus: Open Dashboard"
       }
     ],
     "configuration": {
-      "title": "Swarm Monitor",
+      "title": "Copus",
       "properties": {
-        "swarmMonitor.usageFilePath": {
+        "copus.usageFilePath": {
           "type": "string",
           "default": "",
           "description": "Path to llm-swarm-usage.json. Leave empty to use default (~/.claude/llm-swarm-usage.json)."
         },
-        "swarmMonitor.refreshInterval": {
+        "copus.refreshInterval": {
           "type": "number",
           "default": 30,
           "minimum": 5,
           "maximum": 300,
           "description": "Polling interval in seconds (fallback when file watcher misses changes)."
         },
-        "swarmMonitor.opusPricing": {
+        "copus.opusPricing": {
           "type": "object",
           "default": {
             "inputPerMillion": 15,
@@ -69,7 +69,7 @@
           },
           "description": "Opus pricing for cost comparison calculations."
         },
-        "swarmMonitor.warningThreshold": {
+        "copus.warningThreshold": {
           "type": "number",
           "default": 80,
           "minimum": 50,

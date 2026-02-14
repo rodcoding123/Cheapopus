@@ -3,9 +3,9 @@ import { randomBytes } from "node:crypto";
 import type { UsageData } from "./types.js";
 import { computeMetrics, getOpusPricingForWebview } from "./usage-parser.js";
 
-let currentPanel: SwarmDashboardPanel | undefined;
+let currentPanel: CopusDashboardPanel | undefined;
 
-export class SwarmDashboardPanel implements vscode.Disposable {
+export class CopusDashboardPanel implements vscode.Disposable {
   private readonly panel: vscode.WebviewPanel;
   private readonly extensionUri: vscode.Uri;
   private readonly disposables: vscode.Disposable[] = [];
@@ -19,15 +19,15 @@ export class SwarmDashboardPanel implements vscode.Disposable {
   }
 
   /** Create or reveal the singleton dashboard panel */
-  static createOrShow(extensionUri: vscode.Uri): SwarmDashboardPanel {
+  static createOrShow(extensionUri: vscode.Uri): CopusDashboardPanel {
     if (currentPanel) {
       currentPanel.panel.reveal(vscode.ViewColumn.One);
       return currentPanel;
     }
 
     const panel = vscode.window.createWebviewPanel(
-      "swarmMonitorDashboard",
-      "Swarm Monitor",
+      "copusDashboard",
+      "Copus",
       vscode.ViewColumn.One,
       {
         enableScripts: true,
@@ -38,7 +38,7 @@ export class SwarmDashboardPanel implements vscode.Disposable {
       },
     );
 
-    const instance = new SwarmDashboardPanel(panel, extensionUri);
+    const instance = new CopusDashboardPanel(panel, extensionUri);
     panel.webview.html = instance.getHtmlForWebview();
     currentPanel = instance;
     return instance;
@@ -89,7 +89,7 @@ export class SwarmDashboardPanel implements vscode.Disposable {
   <meta http-equiv="Content-Security-Policy"
     content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}'; font-src ${webview.cspSource}; img-src ${webview.cspSource} data:;">
   <link rel="stylesheet" href="${cssUri}">
-  <title>Swarm Monitor</title>
+  <title>Copus</title>
 </head>
 <body>
   <!-- Header: window status -->

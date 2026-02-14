@@ -11,8 +11,8 @@ export class StatusBar implements vscode.Disposable {
       vscode.StatusBarAlignment.Right,
       100,
     );
-    this.item.command = "swarmMonitor.openDashboard";
-    this.item.tooltip = "Swarm Monitor — Click to open dashboard";
+    this.item.command = "copus.openDashboard";
+    this.item.tooltip = "Copus — Click to open dashboard";
     this.showNoData();
     this.item.show();
   }
@@ -26,7 +26,7 @@ export class StatusBar implements vscode.Disposable {
     const timeStr = formatTimeRemaining(metrics.windowTimeRemainingMs);
     const usagePercent = (used / MAX_PROMPTS_PER_WINDOW) * 100;
 
-    const config = vscode.workspace.getConfiguration("swarmMonitor");
+    const config = vscode.workspace.getConfiguration("copus");
     const warningThreshold = config.get<number>("warningThreshold") ?? 80;
 
     if (metrics.windowTimeRemainingMs === 0) {
@@ -48,9 +48,9 @@ export class StatusBar implements vscode.Disposable {
 
   /** Show the no-data state */
   showNoData(): void {
-    this.item.text = "$(circle-slash) Swarm: No data";
+    this.item.text = "$(circle-slash) Copus: No data";
     this.item.backgroundColor = undefined;
-    this.item.tooltip = "Swarm Monitor — No usage data found";
+    this.item.tooltip = "Copus — No usage data found";
   }
 
   dispose(): void {

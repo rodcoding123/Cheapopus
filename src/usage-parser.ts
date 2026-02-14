@@ -7,14 +7,14 @@ import { MAX_PROMPTS_PER_WINDOW, DEFAULT_OPUS_PRICING, MAX_USAGE_FILE_SIZE } fro
 
 /** Opus pricing from user settings, falling back to defaults */
 function getOpusPricing(): { inputPerMillion: number; outputPerMillion: number } {
-  const config = vscode.workspace.getConfiguration("swarmMonitor");
+  const config = vscode.workspace.getConfiguration("copus");
   const pricing = config.get<{ inputPerMillion: number; outputPerMillion: number }>("opusPricing");
   return pricing ?? { ...DEFAULT_OPUS_PRICING };
 }
 
 /** Resolve the usage file path from settings or default */
 export function getUsageFilePath(): string {
-  const config = vscode.workspace.getConfiguration("swarmMonitor");
+  const config = vscode.workspace.getConfiguration("copus");
   const custom = config.get<string>("usageFilePath");
   if (custom && custom.trim().length > 0) {
     return custom;
@@ -29,7 +29,7 @@ export async function parseUsageFile(filePath?: string): Promise<UsageData | nul
     // Guard against reading unexpectedly large files
     const fileInfo = await stat(resolvedPath);
     if (fileInfo.size > MAX_USAGE_FILE_SIZE) {
-      console.debug(`[Swarm Monitor] Usage file too large (${fileInfo.size} bytes), skipping`);
+      console.debug(`[Copus] Usage file too large (${fileInfo.size} bytes), skipping`);
       return null;
     }
 
@@ -59,7 +59,7 @@ export async function parseUsageFile(filePath?: string): Promise<UsageData | nul
 
     return data;
   } catch (error) {
-    console.debug("[Swarm Monitor] Failed to parse usage file:", error);
+    console.debug("[Copus] Failed to parse usage file:", error);
     return null;
   }
 }

@@ -1,6 +1,6 @@
-# Cheapopus — MCP Swarm Monitor for VS Code
+# Copus — MCP Swarm Pipeline for VS Code
 
-Real-time cost analytics for MCP LLM swarms. See how much you're saving versus Claude Opus at a glance — prompts remaining, cost savings, usage patterns, and performance metrics, all in your status bar and a rich dashboard.
+Real-time cost analytics and development pipeline for MCP LLM swarms. See how much you're saving versus Claude Opus at a glance, then use the integrated skill chain to route intelligence to Opus and labor to cheaper models.
 
 ## Features
 
@@ -21,7 +21,7 @@ Real-time cost analytics for MCP LLM swarms. See how much you're saving versus C
 ### From .vsix
 
 ```bash
-code --install-extension swarm-monitor-0.1.0.vsix
+code --install-extension copus-0.2.0.vsix
 ```
 
 ### From Source
@@ -37,19 +37,19 @@ Then press `F5` in VS Code to launch the Extension Development Host, or package 
 
 ```bash
 npx @vscode/vsce package --no-dependencies
-code --install-extension swarm-monitor-0.1.0.vsix
+code --install-extension copus-0.2.0.vsix
 ```
 
 ## Configuration
 
-Open **Settings > Extensions > Swarm Monitor** or add to `settings.json`:
+Open **Settings > Extensions > Copus** or add to `settings.json`:
 
 | Setting | Type | Default | Description |
 |---|---|---|---|
-| `swarmMonitor.usageFilePath` | `string` | `""` | Path to `llm-swarm-usage.json`. Leave empty for default (`~/.claude/llm-swarm-usage.json`). |
-| `swarmMonitor.refreshInterval` | `number` | `30` | Polling interval in seconds (5-300). Fallback when the file watcher misses changes. |
-| `swarmMonitor.opusPricing` | `object` | `{ inputPerMillion: 15, outputPerMillion: 75 }` | Opus pricing for cost comparison. Adjust if Anthropic changes pricing. |
-| `swarmMonitor.warningThreshold` | `number` | `80` | Percentage of prompts used before the status bar turns yellow (50-99). |
+| `copus.usageFilePath` | `string` | `""` | Path to `llm-swarm-usage.json`. Leave empty for default (`~/.claude/llm-swarm-usage.json`). |
+| `copus.refreshInterval` | `number` | `30` | Polling interval in seconds (5-300). Fallback when the file watcher misses changes. |
+| `copus.opusPricing` | `object` | `{ inputPerMillion: 15, outputPerMillion: 75 }` | Opus pricing for cost comparison. Adjust if Anthropic changes pricing. |
+| `copus.warningThreshold` | `number` | `80` | Percentage of prompts used before the status bar turns yellow (50-99). |
 
 ## How It Works
 
@@ -67,7 +67,7 @@ VS Code Extension Host
         Chart.js visualizations, VS Code theme colors
 ```
 
-The extension watches `llm-swarm-usage.json` — a file written by the [llm-swarm MCP server](https://github.com/rodcoding123/Cheapopus). When the file changes, the status bar updates instantly and the dashboard re-renders. No network requests, no API calls — pure local file reads.
+The extension watches `llm-swarm-usage.json` — a file written by the bundled MCP server. When the file changes, the status bar updates instantly and the dashboard re-renders. No network requests, no API calls — pure local file reads.
 
 ### Data Schema
 
@@ -101,7 +101,7 @@ The extension expects a JSON file with this structure:
       "output_tokens": 2000,
       "cost_usd": 0.003,
       "response_time_ms": 1200,
-      "caller": "review"
+      "caller": "copus:review"
     }
   ]
 }
@@ -121,7 +121,7 @@ npm run lint         # Type check (tsc --noEmit)
 ### Project Structure
 
 ```
-swarm-monitor/
+copus/
   src/
     extension.ts       Entry point (activate/deactivate)
     status-bar.ts      Status bar widget with severity colors
