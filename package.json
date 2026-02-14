@@ -2,7 +2,7 @@
   "name": "copus",
   "displayName": "Copus",
   "description": "MCP swarm development pipeline — real-time cost analytics, Opus vs MiniMax routing, and integrated skill chain for Claude Code.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "publisher": "rodrigo-specter",
   "license": "MIT",
   "repository": {
