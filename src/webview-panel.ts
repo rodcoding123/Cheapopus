@@ -117,6 +117,7 @@ export class CopusDashboardPanel implements vscode.Disposable {
     <button class="tab active" data-tab="cost">Cost Savings</button>
     <button class="tab" data-tab="usage">Usage Patterns</button>
     <button class="tab" data-tab="perf">Performance</button>
+    <button class="tab" data-tab="pipeline">Pipeline</button>
   </div>
 
   <!-- Tab: Cost Savings -->
@@ -145,6 +146,16 @@ export class CopusDashboardPanel implements vscode.Disposable {
       <div class="empty-state">
         <div class="empty-icon">&rarr;</div>
         <div class="empty-text">No request data yet &mdash; performance metrics appear after MCP tool calls</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: Pipeline -->
+  <div id="tab-pipeline" class="tab-content">
+    <div id="pipeline-content">
+      <div class="empty-state">
+        <div class="empty-icon">&#x2699;</div>
+        <div class="empty-text">No pipeline data yet &mdash; run copus:review then copus:fix to see pipeline runs</div>
       </div>
     </div>
   </div>

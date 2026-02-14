@@ -536,6 +536,127 @@
     }
   }
 
+  // ── Pipeline Tab ─────────────────────────────────
+
+  function renderPipeline(data) {
+    var container = document.getElementById("pipeline-content");
+    if (!container) return;
+
+    var runs = data.pipeline_runs || [];
+
+    if (runs.length === 0) {
+      container.innerHTML =
+        '<div class="empty-state"><div class="empty-icon">&#x2699;</div>' +
+        '<div class="empty-text">No pipeline data yet — run copus:review then copus:fix to see pipeline runs</div></div>';
+      destroyChart("pipelineRouting");
+      return;
+    }
+
+    var colors = getThemeColors();
+
+    // Aggregate stats
+    var totalMinimax = 0;
+    var totalOpus = 0;
+    var totalCost = 0;
+    var completedCount = 0;
+    var failedCount = 0;
+    runs.forEach(function (r) {
+      totalMinimax += r.minimax_tasks;
+      totalOpus += r.opus_tasks;
+      totalCost += r.minimax_cost_usd;
+      if (r.status === "completed") completedCount++;
+      if (r.status === "failed") failedCount++;
+    });
+
+    var totalTasks = totalMinimax + totalOpus;
+    var minimaxPct = totalTasks > 0 ? ((totalMinimax / totalTasks) * 100).toFixed(0) : "0";
+    var estimatedOpusCost = totalCost * 250;
+    var savedAmount = estimatedOpusCost - totalCost;
+
+    // Build run history table
+    var tableRows = "";
+    runs.slice().reverse().forEach(function (r) {
+      var statusClass = r.status === "completed" ? "savings" : r.status === "failed" ? "error" : "warning";
+      var statusLabel = r.status === "completed" ? "Done" : r.status === "failed" ? "Failed" : "Running";
+      tableRows +=
+        '<tr>' +
+          '<td>' + r.skill_chain.join(' \u2192 ') + '</td>' +
+          '<td>' + r.findings_total + '</td>' +
+          '<td>' + r.minimax_tasks + '</td>' +
+          '<td>' + r.opus_tasks + '</td>' +
+          '<td>' + formatUsd(r.minimax_cost_usd) + '</td>' +
+          '<td class="' + statusClass + '">' + statusLabel + '</td>' +
+        '</tr>';
+    });
+
+    container.innerHTML =
+      '<div class="card"><div class="hero">' +
+        '<div class="big-number">' + minimaxPct + '%</div>' +
+        '<div class="big-label">Tasks routed to MiniMax (' + totalMinimax + '/' + totalTasks + ')</div>' +
+      '</div></div>' +
+      '<div class="grid-2">' +
+        '<div class="card"><div class="card-title">Task Routing</div>' +
+          (totalTasks > 0
+            ? '<div class="chart-container" style="height:220px"><canvas id="chart-pipeline-routing"></canvas></div>'
+            : '<div class="empty-state"><div class="empty-text">No routing data</div></div>') +
+        '</div>' +
+        '<div class="card"><div class="card-title">Pipeline Stats</div>' +
+          '<div class="stats-row">' +
+            '<div class="stat-item"><div class="stat-value">' + runs.length + '</div>' +
+              '<div class="stat-label">Total Runs</div></div>' +
+            '<div class="stat-item"><div class="stat-value" style="color:' + colors.green + '">' + completedCount + '</div>' +
+              '<div class="stat-label">Completed</div></div>' +
+            '<div class="stat-item"><div class="stat-value" style="color:' + colors.red + '">' + failedCount + '</div>' +
+              '<div class="stat-label">Failed</div></div>' +
+          '</div>' +
+          '<div class="stats-row" style="margin-top:12px">' +
+            '<div class="stat-item"><div class="stat-value">' + formatUsd(totalCost) + '</div>' +
+              '<div class="stat-label">MiniMax Cost</div></div>' +
+            '<div class="stat-item"><div class="stat-value savings">' + formatUsd(savedAmount) + '</div>' +
+              '<div class="stat-label">Est. Savings</div></div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="card"><div class="card-title">Pipeline History (last ' + runs.length + ' runs)</div>' +
+        '<table class="pipeline-table">' +
+          '<thead><tr><th>Chain</th><th>Findings</th><th>MiniMax</th><th>Opus</th><th>Cost</th><th>Status</th></tr></thead>' +
+          '<tbody>' + tableRows + '</tbody>' +
+        '</table>' +
+      '</div>';
+
+    // Routing doughnut
+    destroyChart("pipelineRouting");
+    var routeCanvas = document.getElementById("chart-pipeline-routing");
+    if (routeCanvas && typeof Chart !== "undefined" && totalTasks > 0) {
+      charts.pipelineRouting = new Chart(routeCanvas, {
+        type: "doughnut",
+        data: {
+          labels: ["MiniMax", "Opus"],
+          datasets: [{
+            data: [totalMinimax, totalOpus],
+            backgroundColor: [colors.green + "cc", colors.purple + "cc"],
+            borderWidth: 0,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: "bottom" },
+            tooltip: {
+              callbacks: {
+                label: function (ctx) {
+                  var pct = ((ctx.raw / totalTasks) * 100).toFixed(1);
+                  return ctx.label + ": " + ctx.raw + " tasks (" + pct + "%)";
+                },
+              },
+            },
+          },
+        },
+      });
+    }
+  }
+
   // ── Data Update Handler ────────────────────────
   function handleDataUpdate(payload) {
     currentData = payload.data;
@@ -546,6 +667,7 @@
     renderCostSavings(currentData, currentMetrics);
     renderUsagePatterns(currentData, currentMetrics);
     renderPerformance(currentData, currentMetrics);
+    renderPipeline(currentData);
 
     // Persist state for webview restore (debounced to avoid rapid writes)
     debouncedSetState({ data: currentData, metrics: currentMetrics, opusPricing: currentOpusPricing });

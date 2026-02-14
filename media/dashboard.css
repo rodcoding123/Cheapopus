@@ -259,3 +259,38 @@ body {
   color: var(--vscode-descriptionForeground);
   font-weight: 600;
 }
+
+/* ── Pipeline table ───────────────────────────── */
+
+.pipeline-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.pipeline-table th,
+.pipeline-table td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--vscode-panel-border);
+}
+
+.pipeline-table th {
+  font-weight: 600;
+  color: var(--vscode-descriptionForeground);
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+}
+
+.pipeline-table td.savings {
+  color: var(--vscode-charts-green, #4ec9b0);
+}
+
+.pipeline-table td.error {
+  color: var(--vscode-editorError-foreground, #f14c4c);
+}
+
+.pipeline-table td.warning {
+  color: var(--vscode-editorWarning-foreground, #cca700);
+}

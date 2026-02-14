@@ -38,10 +38,24 @@ export interface ProviderInfo {
   };
 }
 
+export interface PipelineRun {
+  id: string;
+  started: string;
+  completed?: string;
+  skill_chain: string[];
+  findings_total: number;
+  findings_by_difficulty: Record<string, number>;
+  minimax_tasks: number;
+  opus_tasks: number;
+  minimax_cost_usd: number;
+  status: "running" | "completed" | "failed";
+}
+
 export interface UsageData {
   current_window: UsageWindow;
   daily_totals: DailyTotal[];
   recent_requests?: RequestLog[];
+  pipeline_runs?: PipelineRun[];
   provider?: ProviderInfo;
 }
 
