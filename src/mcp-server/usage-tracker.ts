@@ -38,10 +38,24 @@ interface RequestLog {
   failed_count?: number; // batch only: number of tasks that failed
 }
 
+interface PipelineRun {
+  id: string;
+  started: string;
+  completed?: string;
+  skill_chain: string[];       // e.g. ["copus:review", "copus:fix"]
+  findings_total: number;
+  findings_by_difficulty: Record<string, number>;
+  minimax_tasks: number;
+  opus_tasks: number;
+  minimax_cost_usd: number;
+  status: "running" | "completed" | "failed";
+}
+
 interface UsageData {
   current_window: UsageWindow;
   daily_totals: DailyTotal[];
   recent_requests?: RequestLog[]; // backward-compatible (optional)
+  pipeline_runs?: PipelineRun[]; // backward-compatible (optional, 10-run rolling window)
   provider?: {
     name: string;
     pricing: { input_per_million: number; output_per_million: number };
@@ -138,6 +152,12 @@ export class UsageTracker {
     caller?: string;
     error?: string;
     failedCount?: number;
+    pipeline?: {
+      skill_chain: string[];
+      findings_total?: number;
+      minimax_eligible?: number;
+      opus_required?: number;
+    };
   }): Promise<void> {
     const data = await this.ensureLoaded();
 
@@ -188,6 +208,32 @@ export class UsageTracker {
     dailyEntry.total_input_tokens += params.inputTokens;
     dailyEntry.total_output_tokens += params.outputTokens;
     dailyEntry.estimated_cost_usd += params.costUsd;
+
+    // Pipeline tracking (backward-compatible)
+    if (params.pipeline && params.caller) {
+      if (!data.pipeline_runs) {
+        data.pipeline_runs = [];
+      }
+
+      const run: PipelineRun = {
+        id: `run-${Date.now()}`,
+        started: new Date().toISOString(),
+        completed: new Date().toISOString(),
+        skill_chain: params.pipeline.skill_chain,
+        findings_total: params.pipeline.findings_total ?? 0,
+        findings_by_difficulty: {},
+        minimax_tasks: params.pipeline.minimax_eligible ?? 0,
+        opus_tasks: params.pipeline.opus_required ?? 0,
+        minimax_cost_usd: params.costUsd,
+        status: params.error ? "failed" : "completed",
+      };
+
+      data.pipeline_runs.push(run);
+      // Keep rolling window of 10 runs
+      if (data.pipeline_runs.length > 10) {
+        data.pipeline_runs = data.pipeline_runs.slice(-10);
+      }
+    }
 
     await saveUsageData(data);
   }

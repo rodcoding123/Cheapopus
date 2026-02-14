@@ -132,8 +132,14 @@ server.tool(
       .describe("Array of tasks to process in parallel (1-50)"),
     concurrency: z.number().int().min(1).max(20).optional().describe("Max concurrent requests 1-20 (default: 5)"),
     caller: z.string().max(128).optional().describe("Optional skill/caller name for usage tracking"),
+    pipeline: z.object({
+      skill_chain: z.array(z.string()).describe("Skill chain that triggered this batch"),
+      findings_total: z.number().int().optional().describe("Total findings from review"),
+      minimax_eligible: z.number().int().optional().describe("Findings routed to MiniMax"),
+      opus_required: z.number().int().optional().describe("Findings routed to Opus"),
+    }).optional().describe("Optional pipeline context for dashboard tracking"),
   },
-  async ({ tasks, concurrency, caller }) => {
+  async ({ tasks, concurrency, caller, pipeline }) => {
     const startTime = Date.now();
 
     if (!batchProcessor) {
@@ -169,6 +175,7 @@ server.tool(
         responseTimeMs,
         caller,
         failedCount: summary.failed > 0 ? summary.failed : undefined,
+        pipeline,
       });
 
       const output = {
