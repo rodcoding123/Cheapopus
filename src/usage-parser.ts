@@ -41,7 +41,10 @@ export async function parseUsageFile(filePath?: string): Promise<UsageData | nul
       !data.current_window ||
       typeof data.current_window.prompt_count !== "number" ||
       typeof data.current_window.window_start !== "string" ||
-      typeof data.current_window.window_end !== "string"
+      typeof data.current_window.window_end !== "string" ||
+      typeof data.current_window.estimated_cost_usd !== "number" ||
+      typeof data.current_window.total_input_tokens !== "number" ||
+      typeof data.current_window.total_output_tokens !== "number"
     ) {
       return null;
     }

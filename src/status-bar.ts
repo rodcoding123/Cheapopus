@@ -30,16 +30,16 @@ export class StatusBar implements vscode.Disposable {
     const warningThreshold = config.get<number>("warningThreshold") ?? 80;
 
     if (metrics.windowTimeRemainingMs === 0) {
-      this.item.text = `$(error) ${remaining}/${MAX_PROMPTS_PER_WINDOW} | $${cost.toFixed(2)} | expired`;
+      this.item.text = `$(error) ${remaining}/${MAX_PROMPTS_PER_WINDOW} | ${formatCostCompact(cost)} | expired`;
       this.item.backgroundColor = new vscode.ThemeColor("statusBarItem.errorBackground");
     } else if (usagePercent >= 95) {
-      this.item.text = `$(error) ${remaining}/${MAX_PROMPTS_PER_WINDOW} | $${cost.toFixed(2)} | ${timeStr}`;
+      this.item.text = `$(error) ${remaining}/${MAX_PROMPTS_PER_WINDOW} | ${formatCostCompact(cost)} | ${timeStr}`;
       this.item.backgroundColor = new vscode.ThemeColor("statusBarItem.errorBackground");
     } else if (usagePercent >= warningThreshold) {
-      this.item.text = `$(warning) ${remaining}/${MAX_PROMPTS_PER_WINDOW} | $${cost.toFixed(2)} | ${timeStr}`;
+      this.item.text = `$(warning) ${remaining}/${MAX_PROMPTS_PER_WINDOW} | ${formatCostCompact(cost)} | ${timeStr}`;
       this.item.backgroundColor = new vscode.ThemeColor("statusBarItem.warningBackground");
     } else {
-      this.item.text = `$(pulse) ${remaining}/${MAX_PROMPTS_PER_WINDOW} | $${cost.toFixed(2)} | ${timeStr}`;
+      this.item.text = `$(pulse) ${remaining}/${MAX_PROMPTS_PER_WINDOW} | ${formatCostCompact(cost)} | ${timeStr}`;
       this.item.backgroundColor = undefined;
     }
 
@@ -67,6 +67,11 @@ function formatTimeRemaining(ms: number): string {
     return `${hours}h ${minutes}m`;
   }
   return `${minutes}m`;
+}
+
+/** Format cost for compact display: 4 decimals when < $1, 2 decimals otherwise */
+function formatCostCompact(usd: number): string {
+  return `$${usd.toFixed(usd < 1 ? 4 : 2)}`;
 }
 
 function buildTooltip(data: UsageData, metrics: DerivedMetrics): string {

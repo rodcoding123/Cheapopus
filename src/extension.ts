@@ -40,9 +40,9 @@ export function activate(context: vscode.ExtensionContext): void {
 }
 
 export function deactivate(): void {
+  // statusBar and fileWatcher are in context.subscriptions — VS Code disposes them.
+  // dashboardPanel is created lazily and not in subscriptions, so dispose it here.
   dashboardPanel?.dispose();
-  fileWatcher?.dispose();
-  statusBar?.dispose();
   statusBar = undefined;
   fileWatcher = undefined;
   dashboardPanel = undefined;

@@ -27,6 +27,7 @@ export interface RequestLog {
   response_time_ms: number;
   caller?: string;
   error?: string;
+  failed_count?: number; // batch only: number of tasks that failed
 }
 
 export interface ProviderInfo {

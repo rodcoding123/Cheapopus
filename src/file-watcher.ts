@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { dirname } from "node:path";
+import { dirname, basename } from "node:path";
 import { getUsageFilePath, parseUsageFile } from "./usage-parser.js";
 import type { StatusBar } from "./status-bar.js";
 import type { UsageData } from "./types.js";
@@ -12,6 +12,7 @@ export class FileWatcher implements vscode.Disposable {
   private readonly disposables: vscode.Disposable[] = [];
   private readonly statusBar: StatusBar;
   private onDataUpdate: DataUpdateCallback | undefined;
+  private restarting = false;
 
   constructor(statusBar: StatusBar) {
     this.statusBar = statusBar;
@@ -20,6 +21,7 @@ export class FileWatcher implements vscode.Disposable {
   /** Start watching the usage file. Call once from activate(). */
   start(): void {
     const filePath = getUsageFilePath();
+    const fileName = basename(filePath);
 
     // Initial read
     void this.safeRefresh();
@@ -27,7 +29,7 @@ export class FileWatcher implements vscode.Disposable {
     // File system watcher — glob pattern for the specific file
     const pattern = new vscode.RelativePattern(
       vscode.Uri.file(dirname(filePath)),
-      "llm-swarm-usage.json",
+      fileName,
     );
     this.fsWatcher = vscode.workspace.createFileSystemWatcher(pattern);
 
@@ -73,10 +75,16 @@ export class FileWatcher implements vscode.Disposable {
     }
   }
 
-  /** Restart watcher (e.g. after settings change) */
+  /** Restart watcher (e.g. after settings change). Guarded against re-entrancy. */
   private restart(): void {
-    this.stopWatching();
-    this.start();
+    if (this.restarting) return;
+    this.restarting = true;
+    try {
+      this.stopWatching();
+      this.start();
+    } finally {
+      this.restarting = false;
+    }
   }
 
   private stopWatching(): void {

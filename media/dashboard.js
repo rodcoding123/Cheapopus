@@ -1,4 +1,3 @@
-// @ts-nocheck
 /* Swarm Monitor Dashboard — Webview Script */
 
 (function () {
@@ -114,9 +113,7 @@
     return (inputTokens / 1e6) * pricing.inputPerMillion + (outputTokens / 1e6) * pricing.outputPerMillion;
   }
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  //  T10: COST SAVINGS TAB
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ── Cost Savings Tab ──────────────────────────
 
   function renderCostSavings(data, metrics) {
     var container = document.getElementById("cost-content");
@@ -228,9 +225,7 @@
     }
   }
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  //  T11: USAGE PATTERNS TAB
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ── Usage Patterns Tab ────────────────────────
 
   function renderUsagePatterns(data, metrics) {
     var container = document.getElementById("usage-content");
@@ -376,9 +371,7 @@
     }
   }
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  //  T12: PERFORMANCE TAB
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ── Performance Tab ───────────────────────────
 
   function renderPerformance(data, metrics) {
     var container = document.getElementById("perf-content");
@@ -435,7 +428,7 @@
     var batchPct = batchTasks + queryTasks > 0
       ? ((batchTasks / (batchTasks + queryTasks)) * 100).toFixed(0) : "0";
 
-    // Trend: compare last 50 vs previous 50
+    // Trend: compare first half vs second half of recent requests
     var trendIcon = "";
     if (requests.length >= 20) {
       var half = Math.floor(requests.length / 2);
@@ -578,7 +571,6 @@
     // Restore previously saved state
     var state = vscode.getState();
     if (state && state.data && state.metrics) {
-      if (state.opusPricing) currentOpusPricing = state.opusPricing;
       handleDataUpdate(state);
     }
   });

@@ -101,8 +101,7 @@ The extension expects a JSON file with this structure:
       "output_tokens": 2000,
       "cost_usd": 0.003,
       "response_time_ms": 1200,
-      "caller": "review",
-      "error": null
+      "caller": "review"
     }
   ]
 }

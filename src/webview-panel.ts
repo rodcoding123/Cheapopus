@@ -9,6 +9,7 @@ export class SwarmDashboardPanel implements vscode.Disposable {
   private readonly panel: vscode.WebviewPanel;
   private readonly extensionUri: vscode.Uri;
   private readonly disposables: vscode.Disposable[] = [];
+  private disposed = false;
 
   private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
     this.panel = panel;
@@ -45,6 +46,7 @@ export class SwarmDashboardPanel implements vscode.Disposable {
 
   /** Send usage data + derived metrics + pricing config to the webview */
   postData(data: UsageData): void {
+    if (this.disposed) return;
     const metrics = computeMetrics(data);
     const opusPricing = getOpusPricingForWebview();
     this.panel.webview.postMessage({
@@ -54,6 +56,8 @@ export class SwarmDashboardPanel implements vscode.Disposable {
   }
 
   dispose(): void {
+    if (this.disposed) return;
+    this.disposed = true;
     currentPanel = undefined;
     this.panel.dispose();
     for (const d of this.disposables) {

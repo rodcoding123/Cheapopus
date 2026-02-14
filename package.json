@@ -15,6 +15,16 @@
   "categories": [
     "Other"
   ],
+  "keywords": [
+    "mcp",
+    "llm",
+    "swarm",
+    "cost",
+    "analytics",
+    "claude",
+    "opus",
+    "tokens"
+  ],
   "activationEvents": [
     "onStartupFinished"
   ],
